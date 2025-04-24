@@ -1,0 +1,330 @@
+@startuml
+
+
+
+
+class StripeAccount {
+  -stripeId: string
+  -activated: bool
+}
+
+class ContactInfo <<ValueObject>> {
+    -address1: string
+    -address2: string
+    -zipcode: string
+    -city: string
+    -country: string
+}
+
+interface NamedContact {
+    +getName() string;
+    +getContactInfo(): ContactInfo;
+}
+
+class Institut   implements NamedContact {
+    -label : string
+    -siteweb: string
+    -socialNetworks: json
+    -address1: string
+    -address2: string
+    -zipcode: string
+    -city: string
+    -country: Country
+    +getName(): string
+    +getContactInfo(): ContactInfo
+}
+
+enum CivilityEnum {
+ M
+ MME
+ MLLE ' Ou MR, MRS, MS si préféré
+ AUTRE
+}
+enum GenderEnum {
+ MASCULIN
+ FEMININ
+ AUTRE
+ NON_SPECIFIE
+}
+class User implements NamedContact  {
+    -avatar: string
+    -login: string
+    -password: string
+    -civility: CivilityEnum
+    -gender: GenderEnum
+    -firstname: string
+    -lastname: string
+    -birthday: date
+    -nativeCountry: Country
+    -nationality: string
+    -firstlanguage: string
+    -createdAt: datetime
+    -updatedAt: datetime
+    -previousRegistrationNumber: string
+    -inscription: datetime
+    -address1: string
+    -address2: string
+    -zipcode: string
+    -city: string
+    -country: Country
+    +getName(): string
+    +getContactInfo(): ContactInfo
+}
+
+class InstitutTestOwnership {
+    -ownershipType: enum { PROPRIETAIRE, ACHETEUR }
+    -purchaseDate: date
+}
+
+class Test {
+    -label: string
+    -ref: string
+    -isInternal: bool
+    -parent: Test
+}
+
+class Level {
+    -label: string
+    -ref: string
+    -description: string
+}
+
+class Session {
+    -start: datetime
+    -end: datetime
+    -limitDateSubscribe: datetime
+    -placesAvailable: int
+    -validation: bool
+}
+
+class Payment {
+    -amount: float
+    -status: enum { PENDING, COMPLETED, FAILED }
+    -date: datetime
+    -method: string
+}
+
+class Invoice {
+    -seller: NamedContact
+    -buyer: NamedContact
+    -amount: float
+    -status: string
+    -invoiceDate: datetime
+    -ref_invoice: string
+    -invoiceType: enum { ENROLLMENT, TEST_LICENSE }
+}
+
+class InvoiceLine {
+    -label: string
+    -price_HT: float
+    -tva: float
+    -price_TTC: float
+    -exam: Exam
+}
+
+
+
+class Enrollment  {
+    -registrationDate: datetime
+    -hasPaid: bool
+    -information: String
+}
+
+class Exam {
+    -label: string
+    -isWritten: bool
+    -isOption: bool
+    -price: float
+    -coeff: int
+    -nbrQuestions: int
+    -duration: int
+    -successScore: int
+    -test: Test
+    -level : Level
+}
+
+class EnrollmentExam {
+    -finalScore: float
+    -status: enum { REGISTERED, PASSED, FAILED }
+}
+
+class ScheduledExam {
+    -startDate: datetime
+    -location: string
+    -room: string
+    -priceOverride: float
+}
+
+class InstitutExamPricing {
+    -customPrice: float
+    -currency: string
+    -createdAt: datetime
+    -tva: float
+    -isActive: bool
+}
+
+class Skill {
+    -label: string
+    -parent: Skill
+}
+
+Exam "*" -- "*" Skill
+Skill "0..1" -> "0..1" Skill : parent
+
+Test "1" *-- "0..*" Skill
+Test "1" *-- "0..*" Level
+Level "1" *-- "0..*" Exam
+
+User "0..*" -- "0..1" Institut
+Enrollment "1" o-- "1" Invoice
+Session "1" -- "*" ScheduledExam
+Exam "1" -- "*" ScheduledExam
+
+Enrollment "1" -- "*" EnrollmentExam
+EnrollmentExam "*" -- "1" ScheduledExam
+
+Institut "1" -- "*" InstitutExamPricing
+Institut "1" -- "0..1" StripeAccount
+
+Exam "1" -- "*" InstitutExamPricing
+
+
+Institut "*" -- "*" InstitutTestOwnership
+
+InvoiceLine "*" -- "0..1" Exam
+
+Invoice "1" o-- "1" Payment
+Invoice "1" o-- "*" InvoiceLine
+
+Session "*" --> "1" Test
+Session "*" --> "1" Level
+Session "1" -- "*" Enrollment
+
+Test "*" -- "*" InstitutTestOwnership
+
+Test "0..1" -- "0..*" Test : parent
+User "1" -- "*" Enrollment
+
+note right of Test
+  Un test ne peut être utilisé en Session
+  que s’il possède au moins un Skill
+  (car les questions sont rattachées à des compétences)
+end note
+
+
+abstract class Question {
+    -id: int
+    -label: string
+    -instruction: string
+    -duration: int
+    -points: int
+    -test: Test
+    -Level: Level
+    -skills:List<Skill>
+}
+
+
+class MCQQuestion {
+    +text: string
+}
+
+class FillBlankQuestion {
+    +text: string
+    +blankSymbol: string
+    +answers: List<string>
+}
+
+class HighlightQuestion {
+    +text: string
+    +highlights: List<string>
+}
+
+
+
+class Choice {
+    +id: int
+    +text: string
+    +isCorrect: bool
+}
+
+class Media {
+    +type: enum {IMAGE, AUDIO, YOUTUBE}
+    +url: string
+    +description: string
+}
+
+class Subject {
+    -titre: string
+    -description:string
+
+}
+
+
+
+
+
+
+Subject "*" -- "1..*" Question
+Question o-- "0..*" Media : has
+Question <|-- MCQQuestion
+Question <|-- FillBlankQuestion
+Question <|-- HighlightQuestion
+
+Subject "1" -- "1" ScheduledExam
+
+MCQQuestion o-- "0..*" Choice
+
+ScheduledExam "*" -- "1..*" User : examinators
+
+
+class Role {
+    -name: string
+    -type: enum { PLATFORM, INSTITUT }
+    -description: string
+}
+
+class Permission {
+    -code: string
+    -description: string
+}
+
+class UserRole {
+    -assignedAt: datetime
+    -isActive: bool
+}
+
+class RolePermission {
+    -granted: bool
+}
+
+class Module {
+    -code: string
+    -name: string
+    -description: string
+}
+
+class ModulePermission {
+    -action: enum { CREATE, READ, UPDATE, DELETE, MANAGE }
+    -granted: bool
+}
+
+User "1" -- "0..*" UserRole
+Role "1" -- "0..*" UserRole
+Role "1" -- "*" RolePermission
+Permission "1" -- "*" RolePermission
+
+Role "1" -- "*" ModulePermission
+Module "1" -- "*" ModulePermission
+
+note right of User
+  Un utilisateur appartient à zéro ou un seul Institut.
+  L’attribution de rôles se fait via UserRole.
+  Un rôle de type INSTITUT implique un rattachement à un institut.
+end note
+
+note right of ScheduledExam
+  Joue le rôle de classe d'association enrichie
+  entre Exam et Session, avec infos de planification
+end note
+
+@enduml

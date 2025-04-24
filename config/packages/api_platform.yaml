@@ -1,0 +1,11 @@
+api_platform:
+    title: Get-Tested API
+    description: "API pour l'application de de création et de gestion de test en ligne"
+    version: 1.0.0
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+        attributes:
+            normalization_context: { groups: ['default:read'] }
+            denormalization_context: { groups: ['default:write'] }
