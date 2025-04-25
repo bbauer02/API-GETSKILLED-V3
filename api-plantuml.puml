@@ -1,52 +1,75 @@
 @startuml
+!define DONE << (✓,#22B463) done >>
+hide stereotype
 
-
-
-
-class StripeAccount {
-  -stripeId: string
-  -activated: bool
+skinparam class {
+  BackgroundColor<<done>>  #C8E6C9
+  BorderColor<<done>>      #22B463
+  FontColor<<done>>        #145A32
 }
 
-class ContactInfo <<ValueObject>> {
-    -address1: string
-    -address2: string
-    -zipcode: string
-    -city: string
-    -country: string
-}
 
-interface NamedContact {
-    +getName() string;
-    +getContactInfo(): ContactInfo;
-}
+left to right direction
 
-class Institut   implements NamedContact {
-    -label : string
-    -siteweb: string
-    -socialNetworks: json
-    -address1: string
-    -address2: string
-    -zipcode: string
-    -city: string
-    -country: Country
-    +getName(): string
-    +getContactInfo(): ContactInfo
-}
-
-enum CivilityEnum {
+enum "CivilityEnum" <<enum>> DONE    {
  M
  MME
  MLLE ' Ou MR, MRS, MS si préféré
  AUTRE
 }
-enum GenderEnum {
+enum "GenderEnum" DONE {
  MASCULIN
  FEMININ
  AUTRE
  NON_SPECIFIE
 }
-class User implements NamedContact  {
+
+class StripeAccount  <<Entity>> {
+  -stripeId: string
+  -activated: bool
+}
+
+class "ContactInfo" <<ValueObject>> DONE {
+    -address1: string
+    -address2: string
+    -zipcode: string
+    -city: string
+}
+
+class "Counterparty" <<ValueObject>> DONE {
+    -name:string
+    -address1: string
+    -address2: string
+    -zipcode: string
+    -city: string
+    -country: string
+    -vatNumber: string
+}
+
+interface "Contactable" DONE {
+    +getName() string;
+    +getAddress(): string;
+    +getZipcode(): string;
+    +getCity(): string;
+    +getCountry(): string;
+}
+
+class Institut DONE <<Entity>>  implements Contactable {
+    -label : string
+    -siteweb: string
+    -socialNetworks: json
+    -address: ContactInfo
+    -country: Country
+    -vatNumber:string
+    +getName() string;
+    +getAddress(): string;
+    +getZipcode(): string;
+    +getCity(): string;
+    +getCountry(): string;
+}
+
+
+class User <<Entity>> implements Contactable  {
     -avatar: string
     -login: string
     -password: string
@@ -62,34 +85,35 @@ class User implements NamedContact  {
     -updatedAt: datetime
     -previousRegistrationNumber: string
     -inscription: datetime
-    -address1: string
-    -address2: string
-    -zipcode: string
-    -city: string
+    -address: ContactInfo
     -country: Country
-    +getName(): string
-    +getContactInfo(): ContactInfo
+    -platformRole : PlatformRoleEnum
+    +getName() string;
+    +getAddress(): string;
+    +getZipcode(): string;
+    +getCity(): string;
+    +getCountry(): string;
 }
 
-class InstitutTestOwnership {
+class InstitutTestOwnership <<Entity>> {
     -ownershipType: enum { PROPRIETAIRE, ACHETEUR }
     -purchaseDate: date
 }
 
-class Test {
+class Test <<Entity>> {
     -label: string
     -ref: string
     -isInternal: bool
     -parent: Test
 }
 
-class Level {
+class Level <<Entity>> {
     -label: string
     -ref: string
     -description: string
 }
 
-class Session {
+class Session <<Entity>> {
     -start: datetime
     -end: datetime
     -limitDateSubscribe: datetime
@@ -97,16 +121,16 @@ class Session {
     -validation: bool
 }
 
-class Payment {
+class Payment <<Entity>> {
     -amount: float
     -status: enum { PENDING, COMPLETED, FAILED }
     -date: datetime
     -method: string
 }
 
-class Invoice {
-    -seller: NamedContact
-    -buyer: NamedContact
+class Invoice <<Entity>> {
+    -seller: Counterparty
+    -buyer: Counterparty
     -amount: float
     -status: string
     -invoiceDate: datetime
@@ -114,23 +138,22 @@ class Invoice {
     -invoiceType: enum { ENROLLMENT, TEST_LICENSE }
 }
 
-class InvoiceLine {
+class InvoiceLine <<Entity>> {
     -label: string
     -price_HT: float
     -tva: float
-    -price_TTC: float
     -exam: Exam
 }
 
 
 
-class Enrollment  {
+class Enrollment <<Entity>> {
     -registrationDate: datetime
     -hasPaid: bool
     -information: String
 }
 
-class Exam {
+class Exam <<Entity>> {
     -label: string
     -isWritten: bool
     -isOption: bool
@@ -143,19 +166,19 @@ class Exam {
     -level : Level
 }
 
-class EnrollmentExam {
+class EnrollmentExam <<Entity>> {
     -finalScore: float
     -status: enum { REGISTERED, PASSED, FAILED }
 }
 
-class ScheduledExam {
+class ScheduledExam <<Entity>> {
     -startDate: datetime
     -location: string
     -room: string
     -priceOverride: float
 }
 
-class InstitutExamPricing {
+class InstitutExamPricing <<Entity>> {
     -customPrice: float
     -currency: string
     -createdAt: datetime
@@ -163,56 +186,14 @@ class InstitutExamPricing {
     -isActive: bool
 }
 
-class Skill {
+class Skill <<Entity>> {
     -label: string
     -parent: Skill
 }
 
-Exam "*" -- "*" Skill
-Skill "0..1" -> "0..1" Skill : parent
-
-Test "1" *-- "0..*" Skill
-Test "1" *-- "0..*" Level
-Level "1" *-- "0..*" Exam
-
-User "0..*" -- "0..1" Institut
-Enrollment "1" o-- "1" Invoice
-Session "1" -- "*" ScheduledExam
-Exam "1" -- "*" ScheduledExam
-
-Enrollment "1" -- "*" EnrollmentExam
-EnrollmentExam "*" -- "1" ScheduledExam
-
-Institut "1" -- "*" InstitutExamPricing
-Institut "1" -- "0..1" StripeAccount
-
-Exam "1" -- "*" InstitutExamPricing
 
 
-Institut "*" -- "*" InstitutTestOwnership
-
-InvoiceLine "*" -- "0..1" Exam
-
-Invoice "1" o-- "1" Payment
-Invoice "1" o-- "*" InvoiceLine
-
-Session "*" --> "1" Test
-Session "*" --> "1" Level
-Session "1" -- "*" Enrollment
-
-Test "*" -- "*" InstitutTestOwnership
-
-Test "0..1" -- "0..*" Test : parent
-User "1" -- "*" Enrollment
-
-note right of Test
-  Un test ne peut être utilisé en Session
-  que s’il possède au moins un Skill
-  (car les questions sont rattachées à des compétences)
-end note
-
-
-abstract class Question {
+abstract class Question <<Entity>> {
     -id: int
     -label: string
     -instruction: string
@@ -253,68 +234,63 @@ class Media {
     +description: string
 }
 
-class Subject {
+class Subject <<Entity>> {
     -titre: string
     -description:string
 
 }
 
 
+Exam "*" -- "*" Skill
+Exam "1" -- "*" ScheduledExam
+Exam "1" -- "*" InstitutExamPricing
+Enrollment "1" o-- "1" Invoice
+Enrollment "1" -- "*" EnrollmentExam
+EnrollmentExam "*" -- "1" ScheduledExam
+
+Institut "1" -- "*" InstitutExamPricing
+Institut "1" -- "0..1" StripeAccount
+Institut "*" -- "*" InstitutTestOwnership
+InvoiceLine "*" -- "0..1" Exam
+Invoice "1" o-- "1" Payment
+Invoice "1" o-- "*" InvoiceLine
+
+Level "1" *-- "0..*" Exam
+
+MCQQuestion o-- "0..*" Choice
 
 
-
-
-Subject "*" -- "1..*" Question
 Question o-- "0..*" Media : has
 Question <|-- MCQQuestion
 Question <|-- FillBlankQuestion
 Question <|-- HighlightQuestion
 
-Subject "1" -- "1" ScheduledExam
-
-MCQQuestion o-- "0..*" Choice
-
+Session "*" --> "1" Test
+Session "*" --> "1" Level
+Session "1" -- "*" Enrollment
+Session "1" -- "*" ScheduledExam
 ScheduledExam "*" -- "1..*" User : examinators
+Skill "0..1" -> "0..1" Skill : parent
+Subject "1" -- "1" ScheduledExam
+Subject "*" -- "1..*" Question
+
+Test "*" -- "*" InstitutTestOwnership
+Test "0..1" -- "0..*" Test : parent
+Test "1" -- "0..*" Skill
+Test "1" -- "0..*" Level
 
 
-class Role {
-    -name: string
-    -type: enum { PLATFORM, INSTITUT }
-    -description: string
-}
+User "1" -- "*" Enrollment
 
-class Permission {
-    -code: string
-    -description: string
-}
 
-class UserRole {
-    -assignedAt: datetime
-    -isActive: bool
-}
 
-class RolePermission {
-    -granted: bool
-}
 
-class Module {
-    -code: string
-    -name: string
-    -description: string
-}
 
-class ModulePermission {
-    -action: enum { CREATE, READ, UPDATE, DELETE, MANAGE }
-    -granted: bool
-}
-
-User "1" -- "0..*" UserRole
-Role "1" -- "0..*" UserRole
-Role "1" -- "*" RolePermission
-Permission "1" -- "*" RolePermission
-
-Role "1" -- "*" ModulePermission
-Module "1" -- "*" ModulePermission
+note right of Test
+  Un test ne peut être utilisé en Session
+  que s’il possède au moins un Skill
+  (car les questions sont rattachées à des compétences)
+end note
 
 note right of User
   Un utilisateur appartient à zéro ou un seul Institut.
@@ -326,5 +302,42 @@ note right of ScheduledExam
   Joue le rôle de classe d'association enrichie
   entre Exam et Session, avec infos de planification
 end note
+
+note right of Session
+{OCL} self.test.skills->size() >= 1
+end note
+
+' ─────────── NOUVEAU SYSTÈME DE RÔLES ───────────
+
+' Portée plateforme (valeur par défaut : USER)
+enum "PlatformRoleEnum"  DONE{
+  ADMIN
+  USER
+}
+
+' Portée institut
+enum "InstitutRoleEnum"  DONE{
+  ADMIN
+  TEACHER
+  STAFF
+}
+
+
+' Jointure enrichie User ↔ Institut
+class InstitutMembership <<Entity>> DONE {
+  -role  : InstitutRoleEnum
+  -since : datetime
+}
+' Associations
+User     "0..1" -- "0..1" InstitutMembership : membership
+Institut "1"    -- "0..*" InstitutMembership
+
+note right of InstitutMembership
+  Contrainte DB : UNIQUE(user, institut)
+  ⇒ un utilisateur ne peut appartenir qu’à un seul institut.
+end note
+
+
+
 
 @enduml

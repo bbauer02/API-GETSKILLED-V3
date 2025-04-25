@@ -5,8 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use App\Entity\Embeddable\ContactInfo;
-use App\Enum\Civility;
-use App\Enum\Gender;
+use App\Enum\CivilityEnum;
+use App\Enum\GenderEnum;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,12 +31,12 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(enumType: Civility::class)]
+    #[ORM\Column(enumType: CivilityEnum::class)]
     #[ApiProperty(description: 'User civility (e.g., Mr, Mrs, Miss).')]
-    private ?Civility $civility = null;
+    private ?CivilityEnum $civility = null;
 
-    #[ORM\Column(enumType: Gender::class)]
-    private ?Gender $gender = null;
+    #[ORM\Column(enumType: GenderEnum::class)]
+    private ?GenderEnum $gender = null;
 
     #[ORM\Column(length: 255)]
     private ?string $firstname = null;

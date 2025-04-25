@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum Civility : string
+enum CivilityEnum : string
 {
     case MR = 'Mr';
     case MRS = 'Mrs';

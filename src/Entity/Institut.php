@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Entity;
+
+use ApiPlatform\Metadata\ApiResource;
+use App\Entity\Embeddable\ContactInfo;
+use App\Interfaces\Contactable;
+use App\Repository\InstitutRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: InstitutRepository::class)]
+#[ApiResource]
+class Institut implements Contactable
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $label = null;
+    #[ORM\Embedded(class: ContactInfo::class, columnPrefix: 'contact_')]
+    private ?ContactInfo $contactInfo = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $siteweb = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?array $socialNetworks = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Country $Country = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->label;
+    }
+    public function setName(string $label): static
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    public function getSiteweb(): ?string
+    {
+        return $this->siteweb;
+    }
+
+    public function setSiteweb(?string $siteweb): static
+    {
+        $this->siteweb = $siteweb;
+
+        return $this;
+    }
+
+    public function getSocialNetworks(): ?array
+    {
+        return $this->socialNetworks;
+    }
+
+    public function setSocialNetworks(?array $socialNetworks): static
+    {
+        $this->socialNetworks = $socialNetworks;
+
+        return $this;
+    }
+
+    public function getAddress1(): string
+    {
+        return $this->contactInfo->getAddress1();
+    }
+    public function setAddress1(?string $address1): static
+    {
+        $this->contactInfo->setAddress1($address1);
+        return $this;
+    }
+    public function getAddress2(): string
+    {
+        return $this->contactInfo->getAddress2();
+    }
+    public function setAddress2(?string $address2): static
+    {
+        $this->contactInfo->setAddress2($address2);
+        return $this;
+    }
+
+    public function getZipcode(): string
+    {
+        return $this->contactInfo->getZipcode();
+    }
+
+    public function setZipcode(string $zipcode) : static
+    {
+        $this->contactInfo->setZipcode($zipcode);
+        return $this;
+    }
+
+    public function getCity(): string
+    {
+        return $this->contactInfo->getCity();
+    }
+
+    public function setCity(string $city) : static
+    {
+        $this->contactInfo->setCity($city);
+        return $this;
+    }
+
+    public function getCountry(): string
+    {
+        return $this->Country->getName();
+    }
+    public function setCountry(?Country $Country): static
+    {
+        $this->Country = $Country;
+
+        return $this;
+    }
+
+}
