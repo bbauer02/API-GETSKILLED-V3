@@ -24,9 +24,9 @@ enum "GenderEnum" DONE {
  NON_SPECIFIE
 }
 
-class StripeAccount  <<Entity>> {
+class StripeAccount  DONE {
   -stripeId: string
-  -activated: bool
+  -isActivated: bool
 }
 
 class "ContactInfo" <<ValueObject>> DONE {
@@ -69,7 +69,7 @@ class Institut DONE <<Entity>>  implements Contactable {
 }
 
 
-class User <<Entity>> implements Contactable  {
+class User DONE implements Contactable  {
     -avatar: string
     -login: string
     -password: string
@@ -77,6 +77,8 @@ class User <<Entity>> implements Contactable  {
     -gender: GenderEnum
     -firstname: string
     -lastname: string
+    -contactInfo: ContactInfo
+    -country: Country
     -birthday: date
     -nativeCountry: Country
     -nationality: string
@@ -85,8 +87,6 @@ class User <<Entity>> implements Contactable  {
     -updatedAt: datetime
     -previousRegistrationNumber: string
     -inscription: datetime
-    -address: ContactInfo
-    -country: Country
     -platformRole : PlatformRoleEnum
     +getName() string;
     +getAddress(): string;
@@ -95,19 +95,19 @@ class User <<Entity>> implements Contactable  {
     +getCountry(): string;
 }
 
-class InstitutTestOwnership <<Entity>> {
+class InstitutTestOwnership DONE {
     -ownershipType: enum { PROPRIETAIRE, ACHETEUR }
     -purchaseDate: date
 }
 
-class Test <<Entity>> {
+class Test DONE {
     -label: string
     -ref: string
     -isInternal: bool
     -parent: Test
 }
 
-class Level <<Entity>> {
+class Level DONE {
     -label: string
     -ref: string
     -description: string
@@ -249,8 +249,8 @@ Enrollment "1" -- "*" EnrollmentExam
 EnrollmentExam "*" -- "1" ScheduledExam
 
 Institut "1" -- "*" InstitutExamPricing
-Institut "1" -- "0..1" StripeAccount
-Institut "*" -- "*" InstitutTestOwnership
+Institut "1" --> "0..1" StripeAccount
+Institut "1" -- "*" InstitutTestOwnership
 InvoiceLine "*" -- "0..1" Exam
 Invoice "1" o-- "1" Payment
 Invoice "1" o-- "*" InvoiceLine
@@ -274,10 +274,10 @@ Skill "0..1" -> "0..1" Skill : parent
 Subject "1" -- "1" ScheduledExam
 Subject "*" -- "1..*" Question
 
-Test "*" -- "*" InstitutTestOwnership
-Test "0..1" -- "0..*" Test : parent
+Test "1" -- "*" InstitutTestOwnership
+Test "1" -- "0..*" Test : parent
 Test "1" -- "0..*" Skill
-Test "1" -- "0..*" Level
+Test "1" -- "*" Level
 
 
 User "1" -- "*" Enrollment
@@ -292,11 +292,7 @@ note right of Test
   (car les questions sont rattachées à des compétences)
 end note
 
-note right of User
-  Un utilisateur appartient à zéro ou un seul Institut.
-  L’attribution de rôles se fait via UserRole.
-  Un rôle de type INSTITUT implique un rattachement à un institut.
-end note
+
 
 note right of ScheduledExam
   Joue le rôle de classe d'association enrichie
@@ -324,12 +320,12 @@ enum "InstitutRoleEnum"  DONE{
 
 
 ' Jointure enrichie User ↔ Institut
-class InstitutMembership <<Entity>> DONE {
+class InstitutMembership DONE  {
   -role  : InstitutRoleEnum
   -since : datetime
 }
 ' Associations
-User     "0..1" -- "0..1" InstitutMembership : membership
+User     "1" -- "0..1" InstitutMembership : membership
 Institut "1"    -- "0..*" InstitutMembership
 
 note right of InstitutMembership

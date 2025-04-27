@@ -7,6 +7,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use App\Entity\Embeddable\ContactInfo;
 use App\Enum\CivilityEnum;
 use App\Enum\GenderEnum;
+use App\Enum\PlatformRoleEnum;
+use App\Interfaces\Contactable;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     description: 'A user of the application, including login credentials and profile information.'
 )]
-class User
+class User implements Contactable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -73,7 +75,13 @@ class User
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updateAt = null;
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(enumType: PlatformRoleEnum::class)]
+    private ?PlatformRoleEnum $platformRole = null;
+
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'],  fetch: 'EAGER')]
+    private ?InstitutMembership $institutMembership = null;
 
     public function getId(): ?int
     {
@@ -116,24 +124,24 @@ class User
         return $this;
     }
 
-    public function getCivility(): ?Civility
+    public function getCivility(): ?CivilityEnum
     {
         return $this->civility;
     }
 
-    public function setCivility(Civility $civility): static
+    public function setCivility(CivilityEnum $civility): static
     {
         $this->civility = $civility;
 
         return $this;
     }
 
-    public function getGender(): ?Gender
+    public function getGender(): ?GenderEnum
     {
         return $this->gender;
     }
 
-    public function setGender(Gender $gender): static
+    public function setGender(GenderEnum $gender): static
     {
         $this->gender = $gender;
 
@@ -176,9 +184,9 @@ class User
         return $this;
     }
 
-    public function getNativeCountry(): ?Country
+    public function getNativeCountry(): ?string
     {
-        return $this->nativeCountry;
+        return $this->nativeCountry->getName();
     }
 
     public function setNativeCountry(?Country $nativeCountry): static
@@ -188,9 +196,9 @@ class User
         return $this;
     }
 
-    public function getNationality(): ?Country
+    public function getNationality(): ?string
     {
-        return $this->nationality;
+        return $this->nationality->getDemonym();
     }
 
     public function setNationality(?Country $nationality): static
@@ -200,9 +208,9 @@ class User
         return $this;
     }
 
-    public function getFirstlanguage(): ?Country
+    public function getFirstlanguage(): ?string
     {
-        return $this->firstlanguage;
+        return $this->firstlanguage->getLanguageName();
     }
 
     public function setFirstlanguage(?Country $firstlanguage): static
@@ -212,9 +220,9 @@ class User
         return $this;
     }
 
-    public function getCountry(): ?Country
+    public function getCountry(): string
     {
-        return $this->country;
+        return $this->country->getName();
     }
 
     public function setCountry(?Country $country): static
@@ -248,14 +256,89 @@ class User
         return $this;
     }
 
-    public function getUpdateAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updateAt;
+        return $this->updatedAt;
     }
 
-    public function setUpdateAt(\DateTimeImmutable $updateAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
-        $this->updateAt = $updateAt;
+        $this->updateAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getPlatformRole(): ?PlatformRoleEnum
+    {
+        return $this->platformRole;
+    }
+
+    public function setPlatformRole(PlatformRoleEnum $platformRole): static
+    {
+        $this->platformRole = $platformRole;
+
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->firstname . ' ' . $this->lastname;
+    }
+
+    public function getAddress1(): ?string
+    {
+       return $this->contactInfo->getAddress1();
+    }
+    public function setAddress1(string $address1): static
+    {
+        $this->contactInfo->setAddress1($address1);
+        return $this;
+    }
+    public function getAddress2(): ?string
+    {
+        return $this->contactInfo->getAddress2();
+    }
+
+    public function setAddress2(string $address2): static
+    {
+        $this->contactInfo->setAddress2($address2);
+        return $this;
+    }
+
+    public function getZipcode(): ?string
+    {
+        return $this->contactInfo->getZipcode();
+    }
+
+    public function setZipcode(string $zipcode): static
+    {
+        $this->contactInfo->setZipcode($zipcode);
+        return $this;
+    }
+    public function getCity(): ?string
+    {
+        return $this->contactInfo->getCity();
+    }
+
+    public function setCity(string $city): static
+    {
+        $this->contactInfo->setCity($city);
+        return $this;
+    }
+
+    public function getInstitutMembership(): ?InstitutMembership
+    {
+        return $this->institutMembership;
+    }
+
+    public function setInstitutMembership(InstitutMembership $institutMembership): static
+    {
+        // set the owning side of the relation if necessary
+        if ($institutMembership->getUser() !== $this) {
+            $institutMembership->setUser($this);
+        }
+
+        $this->institutMembership = $institutMembership;
 
         return $this;
     }

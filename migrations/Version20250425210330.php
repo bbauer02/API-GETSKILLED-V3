@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250417111624 extends AbstractMigration
+final class Version20250425210330 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20250417111624 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            CREATE TABLE country (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, demonym VARCHAR(255) DEFAULT NULL, language_name VARCHAR(255) NOT NULL, iso_code VARCHAR(3) NOT NULL, UNIQUE INDEX UNIQ_5373C96662B6A45E (iso_code), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            ALTER TABLE institut ADD phone VARCHAR(15) DEFAULT NULL
         SQL);
     }
 
@@ -29,7 +29,7 @@ final class Version20250417111624 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            DROP TABLE country
+            ALTER TABLE institut DROP phone
         SQL);
     }
 }
