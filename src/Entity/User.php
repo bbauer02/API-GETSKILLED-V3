@@ -81,7 +81,7 @@ class User implements Contactable
     private ?PlatformRoleEnum $platformRole = null;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'],  fetch: 'EAGER')]
-    private ?InstitutMembership $institutMembership = null;
+    private ?InstituteMembership $instituteMembership = null;
 
     public function getId(): ?int
     {
@@ -326,19 +326,19 @@ class User implements Contactable
         return $this;
     }
 
-    public function getInstitutMembership(): ?InstitutMembership
+    public function getInstituteMembership(): ?InstituteMembership
     {
-        return $this->institutMembership;
+        return $this->instituteMembership;
     }
 
-    public function setInstitutMembership(InstitutMembership $institutMembership): static
+    public function setInstituteMembership(InstituteMembership $instituteMembership): static
     {
         // set the owning side of the relation if necessary
-        if ($institutMembership->getUser() !== $this) {
-            $institutMembership->setUser($this);
+        if ($instituteMembership->getUser() !== $this) {
+            $instituteMembership->setUser($this);
         }
 
-        $this->institutMembership = $institutMembership;
+        $this->instituteMembership = $instituteMembership;
 
         return $this;
     }

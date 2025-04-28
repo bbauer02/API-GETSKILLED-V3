@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\InstitutTestOwnership;
+use App\Entity\Institut;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<InstitutTestOwnership>
+ * @extends ServiceEntityRepository<Institut>
  */
-class InstitutTestOwnershipRepository extends ServiceEntityRepository
+class InstituteRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, InstitutTestOwnership::class);
+        parent::__construct($registry, Institut::class);
     }
 
 //    /**
-//     * @return InstitutTestOwnership[] Returns an array of InstitutTestOwnership objects
+//     * @return Institut[] Returns an array of Institut objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -31,7 +31,7 @@ class InstitutTestOwnershipRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?InstitutTestOwnership
+//    public function findOneBySomeField($value): ?Institut
 //    {
 //        return $this->createQueryBuilder('i')
 //            ->andWhere('i.exampleField = :val')

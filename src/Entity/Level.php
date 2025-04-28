@@ -15,18 +15,14 @@ class Level
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $label = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 10)]
     private ?string $ref = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
-
-//    #[ORM\ManyToOne(inversedBy: 'levels')]
-//    #[ORM\JoinColumn(nullable: false,  onDelete: 'CASCADE')]
-//    private ?Test $test = null;
 
     public function getId(): ?int
     {
@@ -38,7 +34,7 @@ class Level
         return $this->label;
     }
 
-    public function setLabel(string $label): static
+    public function setLabel(?string $label): static
     {
         $this->label = $label;
 
@@ -65,18 +61,6 @@ class Level
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getTest(): ?Test
-    {
-        return $this->test;
-    }
-
-    public function setTest(?Test $test): static
-    {
-        $this->test = $test;
 
         return $this;
     }

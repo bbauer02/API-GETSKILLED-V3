@@ -5,14 +5,14 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Embeddable\ContactInfo;
 use App\Interfaces\Contactable;
-use App\Repository\InstitutRepository;
+use App\Repository\InstituteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: InstitutRepository::class)]
+#[ORM\Entity(repositoryClass: InstituteRepository::class)]
 #[ApiResource]
-class Institut implements Contactable
+class Institute implements Contactable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,24 +38,24 @@ class Institut implements Contactable
     private ?StripeAccount $stripeAccount = null;
 
     /**
-     * @var Collection<int, InstitutMembership>
+     * @var Collection<int, InstituteMembership>
      */
-    #[ORM\OneToMany(targetEntity: InstitutMembership::class, mappedBy: 'institut', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $institutMemberships;
+    #[ORM\OneToMany(targetEntity: InstituteMembership::class, mappedBy: 'Institute', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $InstituteMemberships;
 
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $phone = null;
 
     /**
-     * @var Collection<int, InstitutTestOwnership>
+     * @var Collection<int, InstituteAssessmentOwnership>
      */
-    #[ORM\OneToMany(targetEntity: InstitutTestOwnership::class, mappedBy: 'institut', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $institutTestOwnerships;
+    #[ORM\OneToMany(targetEntity: InstituteAssessmentOwnership::class, mappedBy: 'institute', orphanRemoval: true)]
+    private Collection $instituteAssessmentOwnerships;
 
     public function __construct()
     {
-        $this->institutMemberships = new ArrayCollection();
-        $this->institutTestOwnerships = new ArrayCollection();
+        $this->InstituteMemberships = new ArrayCollection();
+        $this->instituteAssessmentOwnerships = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,29 +163,29 @@ class Institut implements Contactable
     }
 
     /**
-     * @return Collection<int, InstitutMembership>
+     * @return Collection<int, InstituteMembership>
      */
-    public function getInstitutMemberships(): Collection
+    public function getInstituteMemberships(): Collection
     {
-        return $this->institutMemberships;
+        return $this->InstituteMemberships;
     }
 
-    public function addInstitutMembership(InstitutMembership $institutMembership): static
+    public function addInstituteMembership(InstituteMembership $InstituteMembership): static
     {
-        if (!$this->institutMemberships->contains($institutMembership)) {
-            $this->institutMemberships->add($institutMembership);
-            $institutMembership->setInstitut($this);
+        if (!$this->InstituteMemberships->contains($InstituteMembership)) {
+            $this->InstituteMemberships->add($InstituteMembership);
+            $InstituteMembership->setInstitute($this);
         }
 
         return $this;
     }
 
-    public function removeInstitutMembership(InstitutMembership $institutMembership): static
+    public function removeInstituteMembership(InstituteMembership $InstituteMembership): static
     {
-        if ($this->institutMemberships->removeElement($institutMembership)) {
+        if ($this->InstituteMemberships->removeElement($InstituteMembership)) {
             // set the owning side to null (unless already changed)
-            if ($institutMembership->getInstitut() === $this) {
-                $institutMembership->setInstitut(null);
+            if ($InstituteMembership->getInstitute() === $this) {
+                $InstituteMembership->setInstitute(null);
             }
         }
 
@@ -205,33 +205,35 @@ class Institut implements Contactable
     }
 
     /**
-     * @return Collection<int, InstitutTestOwnership>
+     * @return Collection<int, InstituteAssessmentOwnership>
      */
-    public function getInstitutTestOwnerships(): Collection
+    public function getInstituteAssessmentOwnerships(): Collection
     {
-        return $this->institutTestOwnerships;
+        return $this->instituteAssessmentOwnerships;
     }
 
-    public function addInstitutTestOwnership(InstitutTestOwnership $institutTestOwnership): static
+    public function addInstituteAssessmentOwnership(InstituteAssessmentOwnership $instituteAssessmentOwnership): static
     {
-        if (!$this->institutTestOwnerships->contains($institutTestOwnership)) {
-            $this->institutTestOwnerships->add($institutTestOwnership);
-            $institutTestOwnership->setInstitut($this);
+        if (!$this->instituteAssessmentOwnerships->contains($instituteAssessmentOwnership)) {
+            $this->instituteAssessmentOwnerships->add($instituteAssessmentOwnership);
+            $instituteAssessmentOwnership->setInstitute($this);
         }
 
         return $this;
     }
 
-    public function removeInstitutTestOwnership(InstitutTestOwnership $institutTestOwnership): static
+    public function removeInstituteAssessmentOwnership(InstituteAssessmentOwnership $instituteAssessmentOwnership): static
     {
-        if ($this->institutTestOwnerships->removeElement($institutTestOwnership)) {
+        if ($this->instituteAssessmentOwnerships->removeElement($instituteAssessmentOwnership)) {
             // set the owning side to null (unless already changed)
-            if ($institutTestOwnership->getInstitut() === $this) {
-                $institutTestOwnership->setInstitut(null);
+            if ($instituteAssessmentOwnership->getInstitute() === $this) {
+                $instituteAssessmentOwnership->setInstitute(null);
             }
         }
 
         return $this;
     }
+
+
 
 }

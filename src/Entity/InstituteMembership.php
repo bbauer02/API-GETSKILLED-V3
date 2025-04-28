@@ -3,34 +3,34 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use App\Enum\InstitutRoleEnum;
-use App\Repository\InstitutMembershipRepository;
+use App\Enum\InstituteRoleEnum;
+use App\Repository\InstituteMembershipRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: InstitutMembershipRepository::class)]
+#[ORM\Entity(repositoryClass: InstituteMembershipRepository::class)]
 #[ApiResource]
-class InstitutMembership
+class InstituteMembership
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(enumType: InstitutRoleEnum::class)]
-    private ?InstitutRoleEnum $role = null;
+    #[ORM\Column(enumType: InstituteRoleEnum::class)]
+    private ?InstituteRoleEnum $role = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?DateTimeImmutable $since = null;
 
-    #[ORM\OneToOne(inversedBy: 'institutMembership', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToOne(inversedBy: 'instituteMembership', cascade: ['persist'], orphanRemoval: true)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'institutMemberships', cascade: ['persist'])]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'instituteMemberships')]
     #[ORM\JoinColumn(nullable: false,  onDelete: 'CASCADE')]
-    private ?institut $institut = null;
+    private ?Institute $institute = null;
 
 
     public function __construct()
@@ -79,14 +79,14 @@ class InstitutMembership
         return $this;
     }
 
-    public function getInstitut(): ?institut
+    public function getInstitute(): ?institute
     {
-        return $this->institut;
+        return $this->institute;
     }
 
-    public function setInstitut(?institut $institut): static
+    public function setInstitute(?Institute $institute): static
     {
-        $this->institut = $institut;
+        $this->institute = $institute;
 
         return $this;
     }

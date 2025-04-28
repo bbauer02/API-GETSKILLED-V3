@@ -4,13 +4,13 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Enum\OwnershipTypeEnum;
-use App\Repository\InstitutTestOwnershipRepository;
+use App\Repository\InstituteAssessmentOwnershipRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: InstitutTestOwnershipRepository::class)]
+#[ORM\Entity(repositoryClass: InstituteAssessmentOwnershipRepository::class)]
 #[ApiResource]
-class InstitutTestOwnership
+class InstituteAssessmentOwnership
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -23,13 +23,13 @@ class InstitutTestOwnership
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $purchaseDate = null;
 
-    //#[ORM\ManyToOne(inversedBy: 'institutTestOwnerships')]
-    //#[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    //private ?Test $test = null;
-
-    #[ORM\ManyToOne(inversedBy: 'institutTestOwnerships')]
+    #[ORM\ManyToOne(inversedBy: 'instituteAssessmentOwnerships')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?Institut $institut = null;
+    private ?Institute $institute = null;
+
+    #[ORM\ManyToOne(inversedBy: 'instituteAssessmentOwnerships')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Assessment $assessment = null;
 
     public function getId(): ?int
     {
@@ -60,26 +60,26 @@ class InstitutTestOwnership
         return $this;
     }
 
-    public function getTest(): ?Test
+    public function getInstitute(): ?Institute
     {
-        return $this->test;
+        return $this->institute;
     }
 
-    public function setTest(?Test $test): static
+    public function setInstitute(?Institute $institute): static
     {
-        $this->test = $test;
+        $this->institute = $institute;
 
         return $this;
     }
 
-    public function getInstitut(): ?Institut
+    public function getAssessment(): ?Assessment
     {
-        return $this->institut;
+        return $this->assessment;
     }
 
-    public function setInstitut(?Institut $institut): static
+    public function setAssessment(?Assessment $assessment): static
     {
-        $this->institut = $institut;
+        $this->assessment = $assessment;
 
         return $this;
     }

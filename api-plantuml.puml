@@ -24,6 +24,12 @@ enum "GenderEnum" DONE {
  NON_SPECIFIE
 }
 
+enum "OwnershipTypeEnum" DONE {
+    OWNER
+    BUYER
+}
+
+
 class StripeAccount  DONE {
   -stripeId: string
   -isActivated: bool
@@ -54,7 +60,7 @@ interface "Contactable" DONE {
     +getCountry(): string;
 }
 
-class Institut DONE <<Entity>>  implements Contactable {
+class Institute DONE <<Entity>>  implements Contactable {
     -label : string
     -siteweb: string
     -socialNetworks: json
@@ -95,16 +101,16 @@ class User DONE implements Contactable  {
     +getCountry(): string;
 }
 
-class InstitutTestOwnership DONE {
-    -ownershipType: enum { PROPRIETAIRE, ACHETEUR }
+class InstituteAssessmentOwnership DONE {
+    -ownershipType: OwnershipTypeEnum
     -purchaseDate: date
 }
 
-class Test DONE {
+class Assessment DONE {
     -label: string
     -ref: string
     -isInternal: bool
-    -parent: Test
+    -parent: Assessment
 }
 
 class Level DONE {
@@ -178,7 +184,7 @@ class ScheduledExam <<Entity>> {
     -priceOverride: float
 }
 
-class InstitutExamPricing <<Entity>> {
+class InstituteExamPricing <<Entity>> {
     -customPrice: float
     -currency: string
     -createdAt: datetime
@@ -243,19 +249,20 @@ class Subject <<Entity>> {
 
 Exam "*" -- "*" Skill
 Exam "1" -- "*" ScheduledExam
-Exam "1" -- "*" InstitutExamPricing
+Exam "1" -- "*" InstituteExamPricing
 Enrollment "1" o-- "1" Invoice
 Enrollment "1" -- "*" EnrollmentExam
 EnrollmentExam "*" -- "1" ScheduledExam
 
-Institut "1" -- "*" InstitutExamPricing
-Institut "1" --> "0..1" StripeAccount
-Institut "1" -- "*" InstitutTestOwnership
+Institute "1" -- "*" InstituteExamPricing
+Institute "1" --[#green]> "0..1" StripeAccount
+Institute "1" --[#green] "*" InstituteAssessmentOwnership
 InvoiceLine "*" -- "0..1" Exam
 Invoice "1" o-- "1" Payment
 Invoice "1" o-- "*" InvoiceLine
 
-Level "1" *-- "0..*" Exam
+Level "1" -- "0..*" Exam
+
 
 MCQQuestion o-- "0..*" Choice
 
@@ -265,7 +272,7 @@ Question <|-- MCQQuestion
 Question <|-- FillBlankQuestion
 Question <|-- HighlightQuestion
 
-Session "*" --> "1" Test
+Session "*" --> "1" Assessment
 Session "*" --> "1" Level
 Session "1" -- "*" Enrollment
 Session "1" -- "*" ScheduledExam
@@ -274,11 +281,11 @@ Skill "0..1" -> "0..1" Skill : parent
 Subject "1" -- "1" ScheduledExam
 Subject "*" -- "1..*" Question
 
-Test "1" -- "*" InstitutTestOwnership
-Test "1" -- "0..*" Test : parent
-Test "1" -- "0..*" Skill
-Test "1" -- "*" Level
-
+Assessment "1" --[#green] "*" InstituteAssessmentOwnership
+Assessment "1" --[#green] "0..*" Assessment : parent
+Assessment "1" -- "0..*" Skill
+Assessment "1" --[#green]> "*"  Level
+Assessment "1" -- "0..*" Exam
 
 User "1" -- "*" Enrollment
 
@@ -286,7 +293,7 @@ User "1" -- "*" Enrollment
 
 
 
-note right of Test
+note right of Assessment
   Un test ne peut être utilisé en Session
   que s’il possède au moins un Skill
   (car les questions sont rattachées à des compétences)
@@ -311,26 +318,26 @@ enum "PlatformRoleEnum"  DONE{
   USER
 }
 
-' Portée institut
-enum "InstitutRoleEnum"  DONE{
+' Portée Institute
+enum "InstituteRoleEnum"  DONE{
   ADMIN
   TEACHER
   STAFF
 }
 
 
-' Jointure enrichie User ↔ Institut
-class InstitutMembership DONE  {
-  -role  : InstitutRoleEnum
+' Jointure enrichie User ↔ Institute
+class InstituteMembership DONE  {
+  -role  : InstituteRoleEnum
   -since : datetime
 }
 ' Associations
-User     "1" -- "0..1" InstitutMembership : membership
-Institut "1"    -- "0..*" InstitutMembership
+User     "1" --[#green] "0..1" InstituteMembership : membership
+Institute "1"    --[#green] "0..*" InstituteMembership
 
-note right of InstitutMembership
-  Contrainte DB : UNIQUE(user, institut)
-  ⇒ un utilisateur ne peut appartenir qu’à un seul institut.
+note right of InstituteMembership
+  Contrainte DB : UNIQUE(user, Institute)
+  ⇒ un utilisateur ne peut appartenir qu’à un seul Institute.
 end note
 
 

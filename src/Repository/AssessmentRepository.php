@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\InstitutMembership;
+use App\Entity\Assessment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<InstitutMembership>
+ * @extends ServiceEntityRepository<Assessment>
  */
-class InstitutMembershipRepository extends ServiceEntityRepository
+class AssessmentRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, InstitutMembership::class);
+        parent::__construct($registry, Assessment::class);
     }
 
     //    /**
-    //     * @return InstitutMembership[] Returns an array of InstitutMembership objects
+    //     * @return Assessment[] Returns an array of Assessment objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('i.id', 'ASC')
+    //            ->orderBy('a.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?InstitutMembership
+    //    public function findOneBySomeField($value): ?Assessment
     //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()
